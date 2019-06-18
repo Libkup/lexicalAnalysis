@@ -25,6 +25,7 @@ public class Main {
 	static String currentToken = "";
 	static boolean flag = true;
 	static boolean firstLine = false;
+	static boolean colonFlag = true;
 	static int lineNumber = 0;
 	
 	// 线程保留关键字
@@ -34,8 +35,8 @@ public class Main {
 	
 	// 线程的合法符号和对应的符号单词
 	static String[] symbols = {"=>", "+=>" ,";" , ":", "::", "{", "}", "->"}; 
-	static String[] symbolsLetter = {"EQUALGREATER", "PLUSEQUALGREATER" ,"SEMICOLON" , "COLON",
-									 "DOUBLECOLON", "LEFTBRACKETS", "RIGHTBRACKETS", "MINUSGREATER"}; 
+//	static String[] symbolsLetter = {"EQUALGREATER", "PLUSEQUALGREATER" ,"SEMICOLON" , "COLON",
+//									 "DOUBLECOLON", "LEFTBRACKETS", "RIGHTBRACKETS", "MINUSGREATER"}; 
 	
 	public Main() {
 		// TODO Auto-generated constructor stub
@@ -43,11 +44,15 @@ public class Main {
 
 	public static void main(String[] args) throws IOException {
 
-		reader = new BufferedReader(new FileReader(new File("test3.txt")));;
-		writer = new BufferedWriter(new FileWriter(new File("tokenOut3.txt")));
+		reader = new BufferedReader(new FileReader(new File("test5.txt")));
+		writer = new BufferedWriter(new FileWriter(new File("tokenOut5.txt")));
 		while(state != 13){
-			if(flag)
-				c = getChar();
+			if(flag){
+				if(colonFlag)
+					c = getChar();
+				else 
+					colonFlag = true;
+			}
 			else
 				flag = true;
 			if(c == '$'){
@@ -106,7 +111,7 @@ public class Main {
 				}
 				else {
 					state = 0;
-					if(isKeyWords(currentToken).equals("none")){
+					if(isKeyWords(currentToken).equals("notfound")){
 						writer.write("IDENTIFIER ");
 						writer.flush();
 					}else{
@@ -134,7 +139,7 @@ public class Main {
 				}
 				else {
 					state = 0;
-					if(isKeyWords(currentToken).equals("none")){
+					if(isKeyWords(currentToken).equals("notfound")){
 						writer.write("IDENTIFIER ");
 						writer.flush();
 					}else{
@@ -207,7 +212,7 @@ public class Main {
 				}	
 				else{
 					state = 0;
-					if(isKeyWords(currentToken).equals("none")){
+					if(isKeyWords(currentToken).equals("notfound")){
 						writer.write("DECIMAL ");
 						writer.flush();
 					}else{
@@ -247,7 +252,7 @@ public class Main {
 			case 10:
 				state = 0;
 				flag = false;
-				if(isSymbol(currentToken).equals("none")){
+				if(isSymbol(currentToken).equals("notfound")){
 					writer.write("error ");
 					writer.flush();
 				}else{
@@ -263,20 +268,19 @@ public class Main {
 				}
 				else {
 					state = 0;
-					if(isSymbol(currentToken).equals("none")){
+					if(isSymbol(currentToken).equals("notfound")){
 						writer.write("error ");
 						writer.flush();
 					}else{
 						writer.write(isSymbol(currentToken) + " ");
 						writer.flush();
 					}
+					colonFlag = false;
 					currentToken = "";
 				}	
 				break;
 			case 12:
 				state = 0;
-				
-				
 				if(c == '.'){
 					c = getChar();
 					String str = "";
@@ -284,11 +288,11 @@ public class Main {
 						str += c;
 						c = getChar();
 					}
-						
-					writer.write("(error: ." + str + " is not a legal decimal, line " + lineNumber + ")");
+					writer.write("ERROR ");	
+//					writer.write("(error: ." + str + " is not a legal decimal, line " + lineNumber + ")");
 					writer.flush();
 				}else{
-					writer.write("(error: " + c + " is not a legal letter here, line " + lineNumber + ")");
+					writer.write("ERROR ");
 					writer.flush();
 				}
 				currentToken = "";
@@ -348,7 +352,7 @@ public class Main {
 			if(currToken.equals(keyWords[i]))
 				return keyWords[i];
 		}
-		return "none";
+		return "notfound";
 	}
 	
 	/**
@@ -361,9 +365,9 @@ public class Main {
 	public static String isSymbol(String symbol){
 		for(int i = 0; i < symbols.length; i++){
 			if(symbol.equals(symbols[i]))
-				return symbolsLetter[i];
+				return symbols[i];
 		}
-		return "none";
+		return "notfound";
 	}
 	
 }
